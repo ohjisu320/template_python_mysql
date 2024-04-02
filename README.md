@@ -15,3 +15,8 @@
 + user='cocolabhub',
 + password='cocolabhub',
 + db='python_mysql'
+
+
+#### Share
+- [ERDexcel](https://docs.google.com/spreadsheets/d/1EACJj0UoUFynZ7n44fwx1CS5yjQNbe9g8iXA7fQaU9Q/edit?usp=sharing)
+- [ERDcloud](https://www.erdcloud.com/d/Pr32JC22AHKXTFnrt)
