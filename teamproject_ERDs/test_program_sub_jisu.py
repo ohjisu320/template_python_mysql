@@ -51,18 +51,21 @@ while True :
 # 1
 # int("USER_INFO_1"[10:])
 # 1
-    USER_NAME = input("응시자 이름을 입력하세요: ")
-    with conn.cursor() as cursor:
-        # Read
-        sql = "SELECT USER_INFO_ID FROM USER_INFO"
-        cursor.execute(sql)
-        data = cursor.fetchall()
-        for row in data:
-            last = row
+    try: 
+        USER_NAME = input("응시자 이름을 입력하세요: ")
+        with conn.cursor() as cursor:
+            # Read
+            sql = "SELECT USER_INFO_ID FROM USER_INFO"
+            cursor.execute(sql)
+            data = cursor.fetchall()
+            for row in data:
+                last = row
 
-    
-    USER_INFO_ID = "USER_INFO_"+str(int(last[0][10:])+1)
-
+        
+        USER_INFO_ID = f"USER_INFO_{int(last[0][10:])+1}"
+    except : 
+        
+        USER_INFO_ID = "USER_INFO_1"
 
 
     # mysql로 저장
