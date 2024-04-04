@@ -115,7 +115,7 @@ def grading(conn) :
             else :
                 print(row[3])
 
-        # 응시자별 채점 결과 출력 -- 원본
+        # 응시자별 채점 결과 출력 -- 원본 - 컬럼에 저장해서 불러오기
         # Read
         # sql = f"SELECT * FROM USER_INFO GROUP BY USER_INFO_ID ORDER BY USER_SCORE DESC;"
         # cursor.execute(sql)
@@ -130,8 +130,8 @@ def grading(conn) :
         # print(f"과목 평균 점수: {data[0][0]}")
 
 
-        # 응시자별 채점 결과 출력
-        # Read
+        # 응시자별 채점 결과 출력 쿼리문으로 작성
+    
         sql = "SELECT USER_SCORE.USER_INFO_ID, USER_SCORE.USER_NAME, SUM(USER_SCORE.ANSWER_SCORE) FROM (SELECT USER_ANSWER_INFO.USER_INFO_ID, USER_INFO.USER_NAME, ANSWER_INFO.ANSWER_SCORE FROM USER_ANSWER_INFO INNER JOIN ANSWER_INFO ON ANSWER_INFO.ANSWER_INFO_ID = USER_ANSWER_INFO.ANSWER_INFO_ID  INNER JOIN USER_INFO ON USER_ANSWER_INFO.USER_INFO_ID = USER_INFO.USER_INFO_ID  ) AS USER_SCORE GROUP BY USER_SCORE.USER_INFO_ID;"
         cursor.execute(sql)
         data = cursor.fetchall()
@@ -140,30 +140,20 @@ def grading(conn) :
             print(f"{row[1]}:  {row[2]}")
             
 
-        sql = "SELECT COUNT(USER_SCORE.USER_INFO_ID), SUM(USER_SCORE.ANSWER_SCORE), ROUND(SUM(USER_SCORE.ANSWER_SCORE)/COUNT(USER_SCORE.USER_INFO_ID),2) FROM (SELECT USER_ANSWER_INFO.USER_INFO_ID, USER_INFO.USER_NAME, ANSWER_INFO.ANSWER_SCORE FROM USER_ANSWER_INFO INNER JOIN ANSWER_INFO ON ANSWER_INFO.ANSWER_INFO_ID = USER_ANSWER_INFO.ANSWER_INFO_ID  INNER JOIN USER_INFO ON USER_ANSWER_INFO.USER_INFO_ID = USER_INFO.USER_INFO_ID  ) AS USER_SCORE;"
+        sql = "SELECT SUM(USER_SCORE_UPDATE.USER_SCORE_SEP)/COUNT(USER_SCORE_UPDATE.USER_NAME) FROM (SELECT USER_SCORE.USER_NAME, SUM(USER_SCORE.ANSWER_SCORE) AS USER_SCORE_SEP FROM (SELECT USER_ANSWER_INFO.USER_INFO_ID, USER_INFO.USER_NAME, ANSWER_INFO.ANSWER_SCORE  FROM USER_ANSWER_INFO  INNER JOIN ANSWER_INFO ON ANSWER_INFO.ANSWER_INFO_ID = USER_ANSWER_INFO.ANSWER_INFO_ID   INNER JOIN USER_INFO ON USER_ANSWER_INFO.USER_INFO_ID = USER_INFO.USER_INFO_ID  )  AS USER_SCORE GROUP BY USER_SCORE.USER_INFO_ID) AS USER_SCORE_UPDATE;"
         cursor.execute(sql)
         data = cursor.fetchall()
-        print(f"과목 평균 점수: {data[0][2]*2}")
+        print(f"과목 평균 점수: {round(data[0][0],2)}")
         
 
 
 
+if __name__ == "__main__" :
+    conn = connect_database()
 
-conn = connect_database()
+    # 초기값
+    end_sign = 'c'
 
-# 초기값
-end_sign = 'c'
+    test_start(end_sign, conn)
 
-test_start(end_sign, conn)
-
-grading(conn)
-
-
-        
-
-
-
-
-
-
-# if __name__ == "__main__" :
+    grading(conn)
