@@ -15,6 +15,42 @@ def connect_database() :
         charset='utf8mb4')
     return conn
 
+# 시험 출제
+def test_create(answer_type, quest_type) :
+    print("문제와 선택지를 입력하세요:")
+
+    for x in range(quest_type):
+        QUEST = input(f"문항 {x+1}: ")
+
+        with conn.cursor() as cursor:
+            # QUEST_INFO_ID 가져오기
+            sql = "SELECT COUNT(QUEST_INFO_ID) FROM QUEST_INFO"
+            cursor.execute(sql)
+            data = cursor.fetchall()
+            QUEST_INFO_ID = "QUEST_INFO_"+str(data[0][0]+1)
+            # MYSQL에 문제 저장
+            sql = "INSERT INTO QUEST_INFO (QUEST_INFO_ID, QUEST, QUEST_NUMBER) VALUES (%s, %s, %s)"
+            cursor.execute(sql, (QUEST_INFO_ID, QUEST, x+1))
+            conn.commit()
+
+            # 선택지 입력
+            print("선택지: ")
+            for y in range(answer_type):
+                answer = input(f"{y+1}. ")
+                answer_score = int(input("점수를 입력하세요: "))
+                # ANSWER_INFO_ID 가져오기
+                sql = "SELECT COUNT(ANSWER_INFO_ID) FROM ANSWER_INFO"
+                sq2 = "UPDATE ANSWER_INFO SET ANSWER_SCORE=%s WHERE QUEST_INFO_ID=%s AND ANSWER_NUMBER=%s"
+                cursor.execute(sql)
+                data = cursor.fetchall()
+                ANSWER_INFO_ID = "ANSWER_INFO_"+str(data[0][0]+1)
+                # MYSQL에 선택지 저장
+                sql = "INSERT INTO ANSWER_INFO (ANSWER_INFO_ID, ANSWER, ANSWER_NUMBER, QUEST_INFO_ID) VALUES (%s, %s, %s, %s)"
+                cursor.execute(sql, (ANSWER_INFO_ID, answer, y+1, QUEST_INFO_ID))
+                cursor.execute(sq2, (answer_score, QUEST_INFO_ID, y+1))
+                conn.commit()
+        
+
 # 시험 응시
 def test_start(end_sign, conn) :
     while end_sign == 'c' :
@@ -156,7 +192,10 @@ def grading(conn) :
 
 if __name__ == "__main__" :
     conn = connect_database()
-
+    answer_type = int(input("문제 유형을 입력하세요 (N지 선다형): "))
+    quest_type = int(input("문제 수를 입력하세요 (N개 문항) : "))
+    test_create(answer_type, quest_type)
+    
     # 초기값
     end_sign = 'c'
 
