@@ -2,9 +2,6 @@
 import pymysql
 
 
-
-
-
 # 데이터베이스 연결
 def connect_database() :
     conn = pymysql.connect(
@@ -16,7 +13,25 @@ def connect_database() :
     return conn
 
 # 시험 출제
-def test_create(answer_type, quest_type) :
+def test_create(conn, answer_type, quest_type) :
+    # 시험 출제 전 QUEST/ANSWER 테이블 초기화
+    try : 
+        with conn.cursor() as cursor:
+            sql_reset_0 = "SET FOREIGN_KEY_CHECKS = 0;"
+            sql_reset_1 = "SET FOREIGN_KEY_CHECKS = 1;"
+            sql_delete_quest = "DELETE FROM QUEST_INFO;"
+            sql_delete_answer = "DELETE FROM ANSWER_INFO;"
+            sql_delete_useranswer = "DELETE FROM USER_ANSWER_INFO;"
+            sql_delete_user = "DELETE FROM USER_INFO;"
+            cursor.execute(sql_reset_0)
+            cursor.execute(sql_delete_quest)
+            cursor.execute(sql_delete_answer)
+            cursor.execute(sql_delete_useranswer)
+            cursor.execute(sql_delete_user)
+            cursor.execute(sql_reset_1)
+            conn.commit()
+    except :
+        pass
     print("문제와 선택지를 입력하세요:")
 
     for x in range(quest_type):
@@ -123,10 +138,10 @@ def test_start(end_sign, conn) :
                 cursor.execute(sql)
                 data = cursor.fetchall()
                 ANSWER_INFO_ID = data[0][0]
-                try : 
-                    user_score = user_score+int(data[0][4])
-                except : 
-                    user_score = user_score+0
+                # try : 
+                #     user_score = user_score+int(data[0][4])
+                # except : 
+                #     user_score = user_score+0
 
                 # 유저 정답 저장
                 sql = "INSERT INTO USER_ANSWER_INFO (USER_ANSWER_INFO_ID,USER_INFO_ID, ANSWER_INFO_ID) VALUES (%s, %s, %s)"
@@ -219,9 +234,11 @@ if __name__ == "__main__" :
         if test_start_sign == 'Y':
             test_start(end_sign, conn)
             grading(conn)
+            break
         elif test_start_sign == 'N':
             grading(conn)
+            break
         else :
-            test_start_sign = input("시험을 응시하시겠습니까(Y/N)? :")
+            test_start_sign = input("잘못입력하셨습니다! 시험을 응시하시겠습니까(Y/N)? :")
 
     
