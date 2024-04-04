@@ -3,38 +3,6 @@ import pymysql
 
 
 
-
-list_dict_ANSWER = [
-    {
-    'ANSWER_INFO_ID':"ANSWER_INFO_1"
-    , 'QUEST_INFO_ID':'QUEST_INFO_1'
-    , 'ANSWER' : 'Guido van Rossum'
-    , 'ANSWER_NUMBER' : 1
-    , 'ANSWER_SCORE' : 10
-    }
-    , {
-    'ANSWER_INFO_ID':"ANSWER_INFO_2"
-    , 'QUEST_INFO_ID':'QUEST_INFO_1'
-    , 'ANSWER' : 'James Gosling'
-    , 'ANSWER_NUMBER' : 2
-    , 'ANSWER_SCORE' : 0
-    }
-    , {
-    'ANSWER_INFO_ID':"ANSWER_INFO_3"
-    , 'QUEST_INFO_ID':'QUEST_INFO_1'
-    , 'ANSWER' : 'Dennis Ritchie'
-    , 'ANSWER_NUMBER' : 3
-    , 'ANSWER_SCORE' : 0
-    }
-    ,{
-    'ANSWER_INFO_ID':"ANSWER_INFO_4"
-    , 'QUEST_INFO_ID':'QUEST_INFO_1'
-    , 'ANSWER' : 'Brendan Eich'
-    , 'ANSWER_NUMBER' : 4
-    , 'ANSWER_SCORE' : 0
-    }
-]
-
 # 데이터베이스 연결 설정
 conn = pymysql.connect(
     host='python_mysql_mysql',  # 컨테이너 이름 또는 IP
@@ -43,26 +11,24 @@ conn = pymysql.connect(
     db='python_mysql',  # 데이터베이스 이름
     charset='utf8mb4')
 
-x=1
-quest_type = 4
-answer_type = 2
-while True : 
-#     "USER_INFO_1"[10:]
-# 1
-# int("USER_INFO_1"[10:])
-# 1
+# 초기값들 모음
+
+end_sign = 'c'
+
+
+while end_sign == 'c' :
     try: 
+        user_score = 0
         USER_NAME = input("응시자 이름을 입력하세요: ")
         with conn.cursor() as cursor:
             # Read
-            sql = "SELECT USER_INFO_ID FROM USER_INFO"
+            sql = "SELECT COUNT(USER_INFO_ID) FROM USER_INFO"
             cursor.execute(sql)
             data = cursor.fetchall()
-            for row in data:
-                last = row
+            USER_INFO_number = data[0][0]
 
         
-        USER_INFO_ID = f"USER_INFO_{int(last[0][10:])+1}"
+        USER_INFO_ID = f"USER_INFO_{USER_INFO_number+1}"
     except : 
         
         USER_INFO_ID = "USER_INFO_1"
@@ -74,39 +40,112 @@ while True :
         sql = "INSERT INTO USER_INFO (USER_INFO_ID,USER_NAME) VALUES (%s, %s)"
         cursor.execute(sql, (USER_INFO_ID, USER_NAME))
         conn.commit()
-    x = x+1
+    
     print("문제를 풀어주세요")
 
-    for x in range(len(list_dict_ANSWER)) : # 임의의 값
-        with conn.cursor() as cursor:
-            # Read
-            sql = "SELECT QUEST_NUMBER, QUEST FROM QUEST_INFO"
-            cursor.execute(sql)
-            data = cursor.fetchall()
-            for row in data:
-                print(str(row[0])+". "+str(row[1]))
+    with conn.cursor() as cursor:
+        # 문제 읽기
+        sql = "SELECT * FROM QUEST_INFO"
+        cursor.execute(sql)
+        quest_data = cursor.fetchall()
+        for row in quest_data:
+            # 문제 출력 및 반복
+            print(str(row[2])+". "+row[1])
+            QUEST_INFO_ID = row[0]
+            pass
 
+            # 선택지 출력 및 반복
+            with conn.cursor() as cursor:
+                # Read
+                sql = f"SELECT * FROM ANSWER_INFO HAVING QUEST_INFO_ID = '{QUEST_INFO_ID}';"
+                cursor.execute(sql)
+                data = cursor.fetchall()
+                for row in data:
+                    print(str(row[3])+") "+row[2])
+            
+            
+            # 답항 입력 전 USER_ANSWER_INFO_ID 몇갠지 계산
+            try : 
                 with conn.cursor() as cursor:
                     # Read
-                    sql = "SELECT QUEST_NUMBER, QUEST FROM QUEST_INFO"
+                    sql = f"SELECT COUNT(USER_ANSWER_INFO_ID) FROM USER_ANSWER_INFO"
                     cursor.execute(sql)
                     data = cursor.fetchall()
-                answer_count = 0
-                x = 0
-                while True : 
-                    if list_dict_ANSWER[x]["QUEST_INFO_ID"]=="QUEST_INFO_"+str(x+1) : 
-                        answer_count = answer_count+1
-                        x = x+1
-                        pass
-                    else :
-                        break
-                for y in range(answer_count) :
-                    print(str(list_dict_ANSWER[x]["ANSWER_NUMBER"])+". "+str(list_dict_ANSWER[x]["ANSWER"]))
+                    USER_ANSWER_INFO_ID = "USER_ANSWER_INFO_"+str(data[0][0]+1)
+                    
+            except :
+                USER_ANSWER_INFO_ID = "USER_ANSWER_INFO_1"
+            # 답항 입력
+            user_answer = input("답: ")
+
+            # 유저 정답과 ANSWER_INFO_ID와 매칭한 값 출력
+
+            with conn.cursor() as cursor:
+                # Read
+                sql =  f"SELECT * FROM ANSWER_INFO  HAVING QUEST_INFO_ID = '{QUEST_INFO_ID}' AND ANSWER_NUMBER = '{user_answer}';"
+                cursor.execute(sql)
+                data = cursor.fetchall()
+                ANSWER_INFO_ID = data[0][0]
+                user_score = user_score+int(data[0][4])
 
 
+
+
+
+            # 유저 정답 저장
+            with conn.cursor() as cursor:
+                # Create
+                sql = "INSERT INTO USER_ANSWER_INFO (USER_ANSWER_INFO_ID,USER_INFO_ID, ANSWER_INFO_ID) VALUES (%s, %s, %s)"
+                cursor.execute(sql, (USER_ANSWER_INFO_ID, USER_INFO_ID,ANSWER_INFO_ID))
+                conn.commit()
+            
+        # 유저 점수 저장
+        with conn.cursor() as cursor:
+            # Update
+            sql = "UPDATE USER_INFO SET USER_SCORE=%s WHERE USER_INFO_ID=%s"
+            cursor.execute(sql, (user_score, USER_INFO_ID))
+            conn.commit()
+       
     
+    
+   
+        end_sign = input('다음 응시자가 있나요? (계속: c, 종료: x) : ')
+        while True : 
+            if end_sign == 'c' :
+                break
+            elif end_sign == 'x' :
+                print("program End!")
+                break
+            else :
+                end_sign = input('잘못입력하셨습니다! 다음 응시자가 있나요? (계속: c, 종료: x) : ')
+        
 
 
+# 정답 출력
+with conn.cursor() as cursor:
+    # Read
+    sql = f"SELECT * FROM  ANSWER_INFO HAVING ANSWER_SCORE >0;"
+    cursor.execute(sql)
+    data = cursor.fetchall()
+    print("각 문항 정답 :")
+    for row in data:
+        print(f"{row[3]}, ")
+
+
+# 응시자별 채점 결과 출력
+with conn.cursor() as cursor:
+    # Read
+    sql = f"SELECT * FROM USER_INFO GROUP BY USER_INFO_ID;"
+    cursor.execute(sql)
+    data = cursor.fetchall()
+    print("응시자별 채점 결과: ")
+    for row in data:
+        print(f"{row[1]}:  {row[2]}")
+
+    sql = f"SELECT ROUND(SUM(USER_SCORE)/count(USER_INFO_ID),0) FROM USER_INFO;"
+    cursor.execute(sql)
+    data = cursor.fetchall()
+    print(f"과목 평균 점수: {data[0][0]}")
         
         
 
