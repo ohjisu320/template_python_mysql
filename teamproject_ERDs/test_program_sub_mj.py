@@ -13,7 +13,7 @@ quest_type = int(input("문제 수를 입력하세요 (N개 문항) : "))
 print("문제와 선택지를 입력하세요:")
 
 # with conn.cursor() as cursor:
-#     sql = "DELETE FROM QUEST_INFO WHERE QUEST_INFO_ID IS NOT NULL"
+#     sql = "DELETE FROM QUEST_INFO"
 #     cursor.execute(sql)
 #     conn.commit()
 
@@ -36,6 +36,7 @@ for x in range(quest_type) :
             QUEST_INFO_ID = f"QUEST_INFO_{int(last[0][11:])+1}"
     except :
         QUEST_INFO_ID = "QUEST_INFO_ID_1"
+        
     # mysql로 문제 저장
     with conn.cursor() as cursor:
         # Create
