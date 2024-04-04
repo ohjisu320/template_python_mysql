@@ -37,7 +37,7 @@ def test_create(answer_type, quest_type) :
             print("선택지: ")
             for y in range(answer_type):
                 answer = input(f"{y+1}. ")
-                answer_score = int(input("점수를 입력하세요: "))
+                # answer_score = int(input("점수를 입력하세요: "))
                 # ANSWER_INFO_ID 가져오기
                 sql = "SELECT COUNT(ANSWER_INFO_ID) FROM ANSWER_INFO"
                 sq2 = "UPDATE ANSWER_INFO SET ANSWER_SCORE=%s WHERE QUEST_INFO_ID=%s AND ANSWER_NUMBER=%s"
@@ -47,8 +47,15 @@ def test_create(answer_type, quest_type) :
                 # MYSQL에 선택지 저장
                 sql = "INSERT INTO ANSWER_INFO (ANSWER_INFO_ID, ANSWER, ANSWER_NUMBER, QUEST_INFO_ID) VALUES (%s, %s, %s, %s)"
                 cursor.execute(sql, (ANSWER_INFO_ID, answer, y+1, QUEST_INFO_ID))
-                cursor.execute(sq2, (answer_score, QUEST_INFO_ID, y+1))
+                # cursor.execute(sq2, (answer_score, QUEST_INFO_ID, y+1))
                 conn.commit()
+            correct_answer = input("정답: ")
+            answer_score = int(input("점수 : "))
+            
+            # Update
+            sql = "UPDATE ANSWER_INFO SET ANSWER_SCORE = %s WHERE QUEST_INFO_ID =%s AND ANSWER_NUMBER=%s;"
+            cursor.execute(sql, (answer_score, QUEST_INFO_ID, correct_answer))
+            conn.commit()
         
 
 # 시험 응시
@@ -116,7 +123,10 @@ def test_start(end_sign, conn) :
                 cursor.execute(sql)
                 data = cursor.fetchall()
                 ANSWER_INFO_ID = data[0][0]
-                user_score = user_score+int(data[0][4])
+                try : 
+                    user_score = user_score+int(data[0][4])
+                except : 
+                    user_score = user_score+0
 
                 # 유저 정답 저장
                 sql = "INSERT INTO USER_ANSWER_INFO (USER_ANSWER_INFO_ID,USER_INFO_ID, ANSWER_INFO_ID) VALUES (%s, %s, %s)"
@@ -179,7 +189,12 @@ def grading(conn) :
         data = cursor.fetchall()
         print("응시자별 채점 결과: ")
         for row in data:
-            print(f"{row[1]}:  {row[2]}")
+            if row[2] == None : 
+                print(f"{row[1]}:  0")
+            else : 
+                print(f"{row[1]}:  {row[2]}")
+
+                    
             
 
         sql = "SELECT SUM(USER_SCORE_UPDATE.USER_SCORE_SEP)/COUNT(USER_SCORE_UPDATE.USER_NAME) FROM (SELECT USER_SCORE.USER_NAME, SUM(USER_SCORE.ANSWER_SCORE) AS USER_SCORE_SEP FROM (SELECT USER_ANSWER_INFO.USER_INFO_ID, USER_INFO.USER_NAME, ANSWER_INFO.ANSWER_SCORE  FROM USER_ANSWER_INFO  INNER JOIN ANSWER_INFO ON ANSWER_INFO.ANSWER_INFO_ID = USER_ANSWER_INFO.ANSWER_INFO_ID   INNER JOIN USER_INFO ON USER_ANSWER_INFO.USER_INFO_ID = USER_INFO.USER_INFO_ID  )  AS USER_SCORE GROUP BY USER_SCORE.USER_INFO_ID) AS USER_SCORE_UPDATE;"
@@ -192,13 +207,21 @@ def grading(conn) :
 
 if __name__ == "__main__" :
     conn = connect_database()
-    answer_type = int(input("문제 유형을 입력하세요 (N지 선다형): "))
-    quest_type = int(input("문제 수를 입력하세요 (N개 문항) : "))
-    test_create(answer_type, quest_type)
+    # answer_type = int(input("문제 유형을 입력하세요 (N지 선다형): "))
+    # quest_type = int(input("문제 수를 입력하세요 (N개 문항) : "))
+    # test_create(answer_type, quest_type)
     
     # 초기값
     end_sign = 'c'
+    test_start_sign='Y'
+    while True :
+        test_start_sign = input("시험을 응시하시겠습니까(Y/N)? :")
+        if test_start_sign == 'Y':
+            test_start(end_sign, conn)
+            grading(conn)
+        elif test_start_sign == 'N':
+            grading(conn)
+        else :
+            test_start_sign = input("시험을 응시하시겠습니까(Y/N)? :")
 
-    test_start(end_sign, conn)
-
-    grading(conn)
+    

@@ -40,11 +40,19 @@ def test_create(answer_type, quest_type) :
                 cursor.execute(sql)
                 data = cursor.fetchall()
                 ANSWER_INFO_ID = "ANSWER_INFO_"+str(data[0][0]+1)
-            # MYSQL에 선택지 저장
+                # MYSQL에 선택지 저장
                 sql = "INSERT INTO ANSWER_INFO (ANSWER_INFO_ID, ANSWER, ANSWER_NUMBER, QUEST_INFO_ID) VALUES (%s, %s, %s, %s)"
                 cursor.execute(sql, (ANSWER_INFO_ID, answer, y+1, QUEST_INFO_ID))
                 # cursor.execute(sq2, (answer_score, QUEST_INFO_ID, y+1))
                 conn.commit()
+            correct_answer = input("정답: ")
+            answer_score = int(input("점수 : "))
+            
+            # Update
+            sql = "UPDATE ANSWER_INFO SET ANSWER_SCORE = %s WHERE QUEST_INFO_ID =%s AND ANSWER_NUMBER=%s;"
+            cursor.execute(sql, (answer_score, QUEST_INFO_ID, correct_answer))
+            conn.commit()
+            
         
         # # 점수 입력
         # answer_score = int(input("점수를 입력하세요: "))
