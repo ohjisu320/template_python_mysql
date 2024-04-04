@@ -1,9 +1,12 @@
 
 import pymysql
 
-def connect_database() :
 
-    # 데이터베이스 연결 설정
+
+
+
+# 데이터베이스 연결
+def connect_database() :
     conn = pymysql.connect(
         host='python_mysql_mysql',  # 컨테이너 이름 또는 IP
         user='cocolabhub',
@@ -12,6 +15,7 @@ def connect_database() :
         charset='utf8mb4')
     return conn
 
+# 시험 응시
 def test_start(end_sign, conn) :
     while end_sign == 'c' :
         with conn.cursor() as cursor:
@@ -83,25 +87,27 @@ def test_start(end_sign, conn) :
                 cursor.execute(sql, (USER_ANSWER_INFO_ID, USER_INFO_ID,ANSWER_INFO_ID))
                 conn.commit()
                 
-            # 유저 점수 저장
-            # Update
-            sql = "UPDATE USER_INFO SET USER_SCORE=%s WHERE USER_INFO_ID=%s"
-            cursor.execute(sql, (user_score, USER_INFO_ID))
-            conn.commit()
+            # # 유저 점수 저장
+            # # Update
+            # sql = "UPDATE USER_INFO SET USER_SCORE=%s WHERE USER_INFO_ID=%s"
+            # cursor.execute(sql, (user_score, USER_INFO_ID))
+            # conn.commit()
             # 종료시스템
             end_sign = input('다음 응시자가 있나요? (계속: c, 종료: x) : ')
             while True : 
                 if end_sign == 'c' :
                     break
                 elif end_sign == 'x' :
-                    print("program End!")
+                    print("Test End!")
                     break
                 else :
                     end_sign = input('잘못입력하셨습니다! 다음 응시자가 있나요? (계속: c, 종료: x) : ')
 
-    
+# 시험 채점
 def grading(conn) :
     # 정답 출력
+    print("")
+    print("시험 결과를 조회합니다.")
     with conn.cursor() as cursor:
         # Read
         sql = f"SELECT * FROM  ANSWER_INFO HAVING ANSWER_SCORE >0;"
