@@ -23,12 +23,12 @@ def test_create(conn, answer_type, quest_type) :
             sql_delete_answer = "DELETE FROM ANSWER_INFO;"
             sql_delete_useranswer = "DELETE FROM USER_ANSWER_INFO;"
             sql_delete_user = "DELETE FROM USER_INFO;"
-            cursor.execute(sql_reset_0)
-            cursor.execute(sql_delete_quest)
-            cursor.execute(sql_delete_answer)
-            cursor.execute(sql_delete_useranswer)
-            cursor.execute(sql_delete_user)
-            cursor.execute(sql_reset_1)
+            # cursor.execute(sql_reset_0)
+            # cursor.execute(sql_delete_quest)
+            # cursor.execute(sql_delete_answer)
+            # cursor.execute(sql_delete_useranswer)
+            # cursor.execute(sql_delete_user)
+            # cursor.execute(sql_reset_1)
             conn.commit()
     except :
         pass
