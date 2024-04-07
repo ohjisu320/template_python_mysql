@@ -1,27 +1,16 @@
-## python_mysql
-#### Main package
-- java:17
-- mysql:8
-
-#### CLI with Dockerfile and compose.xml : duration 150.4s
-```
-# --project-name is docker container name
-~$ docker-compose --project-name python_mysql up -d --build
-```
-#### samples
-- [samples/python_mysql.py](./samples/python_mysql.py)
-
-#### database infors
-+ user='cocolabhub',
-+ password='cocolabhub',
-+ db='python_mysql'
-
-
 #### Share
 - [ERDexcel](https://docs.google.com/spreadsheets/d/1EACJj0UoUFynZ7n44fwx1CS5yjQNbe9g8iXA7fQaU9Q/edit?usp=sharing)
 - [ERDcloud](https://www.erdcloud.com/d/Pr32JC22AHKXTFnrt)
 
-#### CREATE TABLE
+#### Members
+
+
+
+<details>
+	<summary>
+		<bold>DDL: CREATE TABLE</bold>
+	</summary>
+
 ```
 CREATE TABLE `QUEST_INFO` (
 	`QUEST_INFO_ID`	VARCHAR(50)	NOT NULL,
@@ -81,3 +70,27 @@ REFERENCES `USER_INFO` (
 	`USER_INFO_ID`
 );
 ```
+
+</details>
+
+
+## python_mysql
+#### Main package
+- java:17
+- mysql:8
+
+#### CLI with Dockerfile and compose.xml : duration 150.4s
+```
+# --project-name is docker container name
+~$ docker-compose --project-name python_mysql up -d --build
+```
+#### samples
+- [samples/python_mysql.py](./samples/python_mysql.py)
+
+#### database infors
++ user='cocolabhub',
++ password='cocolabhub',
++ db='python_mysql'
+
+
+
