@@ -1,6 +1,7 @@
 #### Share
 - [ERDexcel](https://docs.google.com/spreadsheets/d/1EACJj0UoUFynZ7n44fwx1CS5yjQNbe9g8iXA7fQaU9Q/edit?usp=sharing)
 - [ERDcloud](https://www.erdcloud.com/d/Pr32JC22AHKXTFnrt)
+- ![image](https://github.com/ohjisu320/toy_ERDs/assets/151099185/ca6c8a28-f978-474c-8845-e10a73109cb1)
 
 #### Members
 
