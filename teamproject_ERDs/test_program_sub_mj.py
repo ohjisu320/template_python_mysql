@@ -46,8 +46,8 @@ for x in range(quest_type) :
     
 #     create_test()
 
-    with conn.cursor() as cursor:
-        # Create
-        sql = "INSERT INTO TableName (pk_id,column1, column2) VALUES (%s, %s, %s)"
-        cursor.execute(sql, (1, 'value1', 'value2'))
-        conn.commit()
+    # with conn.cursor() as cursor:
+    #     # Create
+    #     sql = "INSERT INTO TableName (pk_id,column1, column2) VALUES (%s, %s, %s)"
+    #     cursor.execute(sql, (1, 'value1', 'value2'))
+    #     conn.commit()
