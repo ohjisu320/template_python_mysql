@@ -28,7 +28,7 @@ sql = "SELECT USER_SCORE.USER_INFO_ID, USER_SCORE.USER_NAME, SUM(USER_SCORE.ANSW
 채점 과정에서 응시자의 점수를 출력하는 과정
 
 ##### NoSQL과의 차이점
-- 쿼리문 안에서 원하는 정보만 빼낼 수 있어서 PYTHON 코드자체는 간결했다.
+- 쿼리문 안에서 평균, 합계, 개수 등 원하는 정보만 빼낼 수 있어서 PYTHON 코드자체는 간결했다.
 
 #### DDL
 
